@@ -1,6 +1,7 @@
 package com.chanak.social.config;
 
 import com.chanak.social.security.JwtAuthFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,6 +44,14 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health").permitAll()
                         .anyRequest().authenticated()
                 )
+                // Kapag walang valid na token, 401 Unauthorized ang ibabalik natin
+                // (hindi 403) - para malinaw na "kailangan mag-login/mag-refresh"
+                // ang ibig sabihin, at para tama ang gamit ng auto-refresh
+                // mechanism sa Android app.
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(
+                        (request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                ))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
