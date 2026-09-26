@@ -3,12 +3,14 @@ package com.chanak.social.dto;
 public class AuthResponse {
 
     private String token;
+    private String refreshToken;
     private Long userId;
     private String username;
     private String displayName;
 
-    public AuthResponse(String token, Long userId, String username, String displayName) {
+    public AuthResponse(String token, String refreshToken, Long userId, String username, String displayName) {
         this.token = token;
+        this.refreshToken = refreshToken;
         this.userId = userId;
         this.username = username;
         this.displayName = displayName;
@@ -20,6 +22,14 @@ public class AuthResponse {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public Long getUserId() {
