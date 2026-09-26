@@ -2,6 +2,7 @@ package com.chanak.social.controller;
 
 import com.chanak.social.dto.AuthResponse;
 import com.chanak.social.dto.LoginRequest;
+import com.chanak.social.dto.RefreshRequest;
 import com.chanak.social.dto.RegisterRequest;
 import com.chanak.social.service.AuthService;
 import jakarta.validation.Valid;
@@ -35,6 +36,16 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             AuthResponse response = authService.login(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@Valid @RequestBody RefreshRequest request) {
+        try {
+            AuthResponse response = authService.refresh(request);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
