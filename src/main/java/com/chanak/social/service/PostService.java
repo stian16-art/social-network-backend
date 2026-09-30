@@ -14,11 +14,13 @@ import com.chanak.social.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class PostService {
 
     private final PostRepository postRepository;
@@ -63,6 +65,32 @@ public class PostService {
 
         long likeCount = postLikeRepository.countByPost(post);
         return new LikeResponse(!alreadyLiked, likeCount);
+    }
+
+    public PostResponse updatePost(String username, Long postId, String newContent) {
+        User currentUser = getUserOrThrow(username);
+        Post post = getPostOrThrow(postId);
+
+        if (!post.getAuthor().getId().equals(currentUser.getId())) {
+            throw new SecurityException("You can only edit your own post");
+        }
+
+        post.setContent(newContent);
+        Post saved = postRepository.save(post);
+        return toPostResponse(saved, currentUser);
+    }
+
+    public void deletePost(String username, Long postId) {
+        User currentUser = getUserOrThrow(username);
+        Post post = getPostOrThrow(postId);
+
+        if (!post.getAuthor().getId().equals(currentUser.getId())) {
+            throw new SecurityException("You can only delete your own post");
+        }
+
+        commentRepository.deleteByPost(post);
+        postLikeRepository.deleteByPost(post);
+        postRepository.delete(post);
     }
 
     public CommentResponse addComment(String username, Long postId, String content) {
