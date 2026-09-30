@@ -27,15 +27,18 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public PostService(PostRepository postRepository,
                         PostLikeRepository postLikeRepository,
                         CommentRepository commentRepository,
-                        UserRepository userRepository) {
+                        UserRepository userRepository,
+                        NotificationService notificationService) {
         this.postRepository = postRepository;
         this.postLikeRepository = postLikeRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     public PostResponse createPost(String username, String content, String imageUrl) {
@@ -61,6 +64,7 @@ public class PostService {
             postLikeRepository.deleteByPostAndUser(post, user);
         } else {
             postLikeRepository.save(new PostLike(post, user));
+            notificationService.notifyLike(post, user);
         }
 
         long likeCount = postLikeRepository.countByPost(post);
@@ -99,6 +103,7 @@ public class PostService {
 
         Comment comment = new Comment(post, author, content);
         Comment saved = commentRepository.save(comment);
+        notificationService.notifyComment(post, author);
 
         return new CommentResponse(
                 saved.getId(),
