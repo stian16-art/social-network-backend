@@ -5,6 +5,7 @@ import com.chanak.social.dto.CommentResponse;
 import com.chanak.social.dto.CreatePostRequest;
 import com.chanak.social.dto.LikeResponse;
 import com.chanak.social.dto.PostResponse;
+import com.chanak.social.dto.UpdatePostRequest;
 import com.chanak.social.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -53,6 +54,31 @@ public class PostController {
                 "totalPosts", feed.getTotalElements(),
                 "hasNext", feed.hasNext()
         ));
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<?> updatePost(Authentication auth, @PathVariable Long postId,
+                                         @Valid @RequestBody UpdatePostRequest request) {
+        try {
+            PostResponse response = postService.updatePost(auth.getName(), postId, request.getContent());
+            return ResponseEntity.ok(response);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<?> deletePost(Authentication auth, @PathVariable Long postId) {
+        try {
+            postService.deletePost(auth.getName(), postId);
+            return ResponseEntity.noContent().build();
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/{postId}/like")
