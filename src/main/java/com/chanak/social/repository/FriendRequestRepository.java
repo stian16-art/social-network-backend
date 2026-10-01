@@ -14,6 +14,8 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, Lo
 
     Optional<FriendRequest> findBySenderAndReceiver(User sender, User receiver);
 
+    List<FriendRequest> findByReceiverAndStatusOrderByCreatedAtDesc(User receiver, FriendRequestStatus status);
+
     @Query("SELECT fr FROM FriendRequest fr WHERE (fr.sender = :user OR fr.receiver = :user) AND fr.status = :status")
     List<FriendRequest> findAllInvolvingUserWithStatus(@Param("user") User user, @Param("status") FriendRequestStatus status);
 
