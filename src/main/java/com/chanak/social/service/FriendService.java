@@ -1,5 +1,6 @@
 package com.chanak.social.service;
 
+import com.chanak.social.dto.FriendRequestSummary;
 import com.chanak.social.dto.FriendStatusResponse;
 import com.chanak.social.model.FriendRequest;
 import com.chanak.social.model.FriendRequestStatus;
@@ -9,7 +10,9 @@ import com.chanak.social.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -50,6 +53,22 @@ public class FriendService {
         }
 
         return new FriendStatusResponse("NONE", null);
+    }
+
+    public List<FriendRequestSummary> getPendingRequests(String username) {
+        User currentUser = getUserOrThrow(username);
+
+        return friendRequestRepository
+                .findByReceiverAndStatusOrderByCreatedAtDesc(currentUser, FriendRequestStatus.PENDING)
+                .stream()
+                .map(fr -> new FriendRequestSummary(
+                        fr.getId(),
+                        fr.getSender().getId(),
+                        fr.getSender().getUsername(),
+                        fr.getSender().getDisplayName(),
+                        fr.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
     }
 
     public void sendRequest(String fromUsername, Long toUserId) {
