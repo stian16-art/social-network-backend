@@ -1,5 +1,6 @@
 package com.chanak.social.controller;
 
+import com.chanak.social.dto.FriendRequestSummary;
 import com.chanak.social.dto.FriendStatusResponse;
 import com.chanak.social.service.FriendService;
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -27,6 +29,12 @@ public class FriendController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         }
+    }
+
+    @GetMapping("/requests")
+    public ResponseEntity<?> getPendingRequests(Authentication auth) {
+        List<FriendRequestSummary> requests = friendService.getPendingRequests(auth.getName());
+        return ResponseEntity.ok(Map.of("requests", requests));
     }
 
     @PostMapping("/request/{userId}")
