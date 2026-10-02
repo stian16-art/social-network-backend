@@ -63,6 +63,14 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Firebase Admin SDK - para makapag-isyu ng Firebase custom tokens
+             galing sa existing (JWT-based) login system natin -->
+        <dependency>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
+            <version>9.3.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
