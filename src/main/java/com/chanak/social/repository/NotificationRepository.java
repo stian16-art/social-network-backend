@@ -14,6 +14,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     Page<Notification> findByRecipientOrderByCreatedAtDesc(User recipient, Pageable pageable);
 
     long countByRecipientAndReadFalse(User recipient);
+    long countByRecipientAndReadFalseAndTypeNot(User recipient, NotificationType type);
 
     @Modifying
     @Query("UPDATE Notification n SET n.read = true WHERE n.recipient = :recipient AND n.read = false")
