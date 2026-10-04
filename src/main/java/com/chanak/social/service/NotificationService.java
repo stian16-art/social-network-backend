@@ -58,7 +58,8 @@ public class NotificationService {
     }
 
     public long getUnreadCount(User user) {
-        return notificationRepository.countByRecipientAndReadFalse(user);
+        return notificationRepository.countByRecipientAndReadFalseAndTypeNot(
+                user, NotificationType.FRIEND_REQUEST);
     }
 
     @Transactional
